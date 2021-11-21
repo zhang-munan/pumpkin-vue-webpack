@@ -19,7 +19,7 @@ const config = {
     }),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin()
-    
+
   ],
   module: {
     rules: [
@@ -28,12 +28,26 @@ const config = {
         loader: 'vue-loader'
       },
       {
+        test: /\.jsx$/,
+        loader: 'babel-loader'
+      },
+      {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },
       {
         test: /\.styl/,
-        use: ["style-loader", "css-loader", "stylus-loader"],
+        use: [
+          "style-loader",
+          "css-loader",
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: true
+            }
+          },
+          "stylus-loader"
+        ],
       },
       {
         test: /\.(gif|jpg|jpeg|png|svg)$/,
@@ -65,9 +79,9 @@ if (isDev) {
     hot: true
     // open: true
   },
-  config.plugins.push(
-    new webpack.NoEmitOnErrorsPlugin()
-  )
+    config.plugins.push(
+      new webpack.NoEmitOnErrorsPlugin()
+    )
 }
 
 module.exports = config
