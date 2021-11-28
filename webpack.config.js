@@ -11,7 +11,8 @@ const config = {
   entry: path.join(__dirname, 'src/main.js'),
   output: {
     filename: 'bundle.js',
-    path: path.join(__dirname, 'dist')
+    path: path.join(__dirname, 'dist'),
+    assetModuleFilename: 'images/[hash][ext][query]'
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -36,6 +37,22 @@ const config = {
         use: ["style-loader", "css-loader"],
       },
       {
+        test: /\.s[ac]ss$/i,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              implementation: require('sass'),
+              sassOptions: {
+                fiber: false,
+              },
+            },
+          },
+        ],
+      },
+      {
         test: /\.styl/,
         use: [
           "style-loader",
@@ -48,20 +65,16 @@ const config = {
           },
           "stylus-loader"
         ],
-      },
-      {
-        test: /\.(gif|jpg|jpeg|png|svg)$/,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 1024,
-              name: '[name]-nanum.[ext]'
-            }
-          }
-        ]
       }
     ]
+  },
+  performance: {
+    hints:'warning',
+    maxEntrypointSize: 50000000,
+    maxAssetSize: 30000000,
+    assetFilter: function(assetFilename) {
+      return assetFilename.endsWith('.js');
+    }
   }
 }
 
@@ -78,10 +91,10 @@ if (isDev) {
     },
     hot: true
     // open: true
-  },
-    config.plugins.push(
-      new webpack.NoEmitOnErrorsPlugin()
-    )
+  }
+  config.plugins.push(
+    new webpack.NoEmitOnErrorsPlugin()
+  )
 }
 
 module.exports = config
